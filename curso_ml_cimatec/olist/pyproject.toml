@@ -16,6 +16,7 @@ classifiers = [
     
 ]
 dependencies = [
+    "ipykernel>=7.3.0",
     "ipython",
     "jupyterlab",
     "loguru",
@@ -30,10 +31,12 @@ dependencies = [
     "ruff",
     "scikit-learn",
     "seaborn>=0.13.2",
+    "setuptools>=65,<81",
     "tqdm",
     "typer",
+    "ydata-profiling>=4.18.4",
 ]
-requires-python = "~=3.14.0"
+requires-python = "~=3.12.3"
 
 
 [tool.ruff]
