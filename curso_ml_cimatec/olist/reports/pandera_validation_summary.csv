@@ -1,0 +1,6 @@
+table,column,check,ocorrencias
+olist_geolocation_dataset.csv,geolocation_lat,less_than_or_equal_to(6.0),26
+olist_geolocation_dataset.csv,geolocation_lng,less_than_or_equal_to(-32.0),22
+olist_geolocation_dataset.csv,geolocation_lat,greater_than_or_equal_to(-34.0),5
+olist_geolocation_dataset.csv,geolocation_lng,greater_than_or_equal_to(-74.0),4
+olist_products_dataset.csv,product_weight_g,greater_than(0),4

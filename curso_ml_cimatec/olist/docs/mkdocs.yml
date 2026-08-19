@@ -1,4 +1,9 @@
 site_name: Olist
-# 
+#
 site_author: Rodrigo de Jesus Macedo
-# 
+#
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Data Pipeline: data-pipeline.md

@@ -8,7 +8,9 @@ dependencies = [
     "cookiecutter-data-science>=2.3.0",
     "ipykernel>=7.3.0",
     "jupyter>=1.1.1",
+    "loguru>=0.7.3",
     "pandas>=2.3.3",
+    "pandera>=0.32.1",
     "setuptools>=65,<81",
     "ydata-profiling>=4.18.4",
 ]
