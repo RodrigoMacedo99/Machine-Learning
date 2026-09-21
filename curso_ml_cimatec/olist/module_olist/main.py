@@ -1,7 +1,7 @@
 from pathlib import Path
 
-import typer
 from loguru import logger
+import typer
 
 from module_olist.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
 from module_olist.dataset import load_dataset, save_dataset
@@ -9,7 +9,7 @@ from module_olist.features import create_dataset
 from module_olist.modeling.evaluate import evaluate_model
 from module_olist.modeling.pipeline import CATEGORICAL_FEATURES, NUMERICAL_FEATURES
 from module_olist.modeling.split import split_data
-from module_olist.modeling.train import train_models
+from module_olist.modeling.train import cross_validate_models, train_models
 
 app = typer.Typer()
 
@@ -30,11 +30,13 @@ def run_pipeline(
 	dataset = create_dataset(orders, items, customers).dropna(subset=FEATURE_COLUMNS + ["is_late"])
 
 	if features_path is not None:
+		features_path.parent.mkdir(parents=True, exist_ok=True)
 		save_dataset(dataset, features_path)
 
 	x_train, x_test, y_train, y_test = split_data(
 		dataset, features=FEATURE_COLUMNS, target="is_late"
 	)
+	cross_validate_models(x_train, y_train)
 	models = train_models(x_train, y_train)
 	if not models:
 		raise RuntimeError("Nenhum modelo foi treinado.")
