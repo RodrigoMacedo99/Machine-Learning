@@ -1,0 +1,21 @@
+[project]
+name = "structured-data-classification-from-scratch"
+version = "0.1.0"
+description = "Binary classification of structured data with Keras and PyTorch"
+readme = "README.md"
+authors = [
+    { name = "Rodrigo de Jesus Macêdo", email = "104858896+RodrigoMacedo99@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "keras>=3.15.1",
+    "pandas>=3.0.6",
+    "torch>=2.14.0",
+]
+
+[project.scripts]
+structured-data-classification-from-scratch = "structured_data_classification_from_scratch:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
