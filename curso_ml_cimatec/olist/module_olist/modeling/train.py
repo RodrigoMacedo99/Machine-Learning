@@ -31,6 +31,18 @@ def train_models(x_train, y_train) -> dict[str, Pipeline]:
 
     return models
 
+        # cross_validate devolve um array de `cv` valores por métrica
+        # (um por fold), em chaves "test_<metrica>". Antes de resumir,
+        # logamos o resultado fold a fold para inspecionar a variação
+        # entre eles (ex.: um fold muito pior que os outros pode indicar
+        # um subconjunto de dados atípico).
+        n_folds = len(scores[f"test_{SCORING[0]}"])
+        for fold_idx in range(n_folds):
+            fold_metrics = ", ".join(
+                f"{metric}={scores[f'test_{metric}'][fold_idx]:.3f}"
+                for metric in SCORING
+            )
+            logger.debug(f"[CV] {model_name} | fold {fold_idx + 1}/{n_folds}: {fold_metrics}")
 
 def cross_validate_models(
     x: pd.DataFrame,
