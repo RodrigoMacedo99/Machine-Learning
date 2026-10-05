@@ -1,6 +1,44 @@
-import pandas as pd
 from pathlib import Path
+import shutil
+
 from loguru import logger
+import pandas as pd
+
+from module_olist.config import RAW_DATA_DIR
+
+RAW_DATASET = "olistbr/brazilian-ecommerce"
+RAW_DATA_FILES = (
+    "olist_orders_dataset.csv",
+    "olist_order_items_dataset.csv",
+    "olist_customers_dataset.csv",
+)
+
+
+def download_raw_dataset(output_dir: Path = RAW_DATA_DIR) -> tuple[Path, ...]:
+    """Baixa do Kaggle os arquivos brutos usados pelo pipeline."""
+    try:
+        import kagglehub
+    except ModuleNotFoundError as error:
+        raise RuntimeError(
+            "kagglehub não está instalado. Execute 'uv sync' ou "
+            "'pip install kagglehub[pandas-datasets]'."
+        ) from error
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    downloaded_dir = Path(kagglehub.dataset_download(RAW_DATASET))
+
+    downloaded_files = []
+    for filename in RAW_DATA_FILES:
+        source = downloaded_dir / filename
+        if not source.is_file():
+            raise FileNotFoundError(f"Arquivo esperado não encontrado no dataset: {source}")
+
+        destination = output_dir / filename
+        shutil.copy2(source, destination)
+        downloaded_files.append(destination)
+        logger.info(f"Arquivo salvo em {destination}")
+
+    return tuple(downloaded_files)
 
 def load_dataset(orders_path: Path, items_path: Path, customers_path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
@@ -173,3 +211,7 @@ def aggregate_itens(items: pd.DataFrame) -> pd.DataFrame:
 
     # Retrona as cinco primeiras linhas da tabela agregada.
     return items_agg
+
+
+if __name__ == "__main__":
+    download_raw_dataset()
