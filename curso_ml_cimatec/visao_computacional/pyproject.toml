@@ -9,5 +9,5 @@ dependencies = [
     "nbconvert>=7.17.2",
     "nbformat>=5.11.1",
     "scikit-learn>=1.9.1",
-    "tensorflow>=2.21.0",
+    "tensorflow[and-cuda]>=2.21.0",
 ]
