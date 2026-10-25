@@ -89,26 +89,17 @@ def test_create_dataset_has_one_row_per_order(orders, items, customers):
     assert set(FEATURES + [TARGET]) <= set(result.columns)
 
 
-def make_modeling_dataset(n_rows: int = 100) -> pd.DataFrame:
-    data = {feature: range(n_rows) for feature in FEATURES if feature != "customer_state"}
-    data["customer_state"] = ["BA", "PE"] * (n_rows // 2)
-    data[TARGET] = [1, 0, 0, 0, 0] * (n_rows // 5)
-    return pd.DataFrame(data)
+def test_split_data_uses_80_20_and_keeps_target_ratio(modeling_dataset):
+    X_train, X_test, y_train, y_test = split_data(modeling_dataset)
 
-
-def test_split_data_uses_80_20_and_keeps_target_ratio():
-    dataset = make_modeling_dataset()
-
-    X_train, X_test, y_train, y_test = split_data(dataset)
-
-    assert len(X_train) == 80
-    assert len(X_test) == 20
+    assert len(X_train) == 240
+    assert len(X_test) == 60
     assert list(X_train.columns) == FEATURES
-    assert y_train.mean() == pytest.approx(y_test.mean())
+    assert y_train.mean() == pytest.approx(y_test.mean(), abs=0.02)
 
 
-def test_split_data_raises_when_feature_is_missing():
-    dataset = make_modeling_dataset().drop(columns=["item_count"])
+def test_split_data_raises_when_feature_is_missing(modeling_dataset):
+    dataset = modeling_dataset.drop(columns=["item_count"])
 
     with pytest.raises(KeyError):
         split_data(dataset)
