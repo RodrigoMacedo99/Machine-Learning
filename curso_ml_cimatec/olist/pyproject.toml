@@ -33,6 +33,7 @@ dependencies = [
     "scikit-learn",
     "seaborn>=0.13.2",
     "setuptools>=65,<81",
+    "shap>=0.54.1",
     "tqdm",
     "typer",
     "ydata-profiling>=4.18.4",
