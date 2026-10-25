@@ -90,3 +90,7 @@ target/
 
 # uv
 .venv/
+
+# Modelos treinados e métricas geradas por src/models/train_model.py
+/models/*.keras
+/reports/metrics_*.json
