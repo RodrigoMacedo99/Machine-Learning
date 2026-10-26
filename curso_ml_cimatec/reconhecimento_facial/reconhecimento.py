@@ -7,11 +7,11 @@ retângulo vermelho com "ACESSO NEGADO". As imagens anotadas são salvas em `res
 
 from pathlib import Path
 
-from deepface import DeepFace
-from loguru import logger
 import cv2
 import numpy as np
 import typer
+from deepface import DeepFace
+from loguru import logger
 
 app = typer.Typer()
 
@@ -21,6 +21,8 @@ TEST_DIR = BASE_DIR / "fotos_teste"
 OUTPUT_DIR = BASE_DIR / "resultados"
 
 MODEL_NAME = "ArcFace"
+# RetinaFace alinha os rostos melhor que o detector padrão (OpenCV), o que muda muito a distância.
+DETECTOR_BACKEND = "retinaface"
 # Limiar de distância cosseno recomendado pelo DeepFace para o modelo ArcFace.
 DISTANCE_THRESHOLD = 0.68
 
@@ -30,7 +32,9 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
 def list_images(folder: Path) -> list[Path]:
-    return sorted(path for path in folder.iterdir() if path.suffix.lower() in IMAGE_EXTENSIONS)
+    return sorted(
+        path for path in folder.iterdir() if path.suffix.lower() in IMAGE_EXTENSIONS
+    )
 
 
 def cosine_distance(a: np.ndarray, b: np.ndarray) -> float:
@@ -45,6 +49,7 @@ def load_authorized_embeddings(folder: Path) -> list[np.ndarray]:
             faces = DeepFace.represent(
                 img_path=str(photo),
                 model_name=MODEL_NAME,
+                detector_backend=DETECTOR_BACKEND,
                 enforce_detection=True,
             )
         except ValueError:
@@ -87,6 +92,7 @@ def check_photo(photo: Path, authorized: list[np.ndarray]) -> np.ndarray | None:
         faces = DeepFace.represent(
             img_path=str(photo),
             model_name=MODEL_NAME,
+            detector_backend=DETECTOR_BACKEND,
             enforce_detection=True,
         )
     except ValueError:
