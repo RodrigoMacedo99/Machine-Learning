@@ -35,6 +35,7 @@ dependencies = [
     "scikit-learn",
     "seaborn>=0.13.2",
     "setuptools>=65,<81",
+    "shap>=0.54.1",
     "tqdm",
     "typer",
     "xgboost>=3.4.1",
