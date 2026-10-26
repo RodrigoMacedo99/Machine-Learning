@@ -9,6 +9,8 @@ from module_olist.modeling.train import (
     build_model,
     compare_validation,
     cross_validate_model,
+    cross_validate_models,
+    train_models,
 )
 
 
@@ -59,6 +61,28 @@ def test_cross_validate_model_reports_train_and_test_scores(modeling_dataset):
 
     assert {"roc_auc_treino", "roc_auc_teste", "f1_teste"} <= set(result)
     assert 0.5 < result["roc_auc_teste"] <= 1.0
+
+
+def test_train_models_fits_every_configured_model(modeling_dataset):
+    X_train, X_test, y_train, _ = split_data(modeling_dataset)
+
+    models = train_models(X_train, y_train)
+
+    assert set(models) == {"gradient_boosting", "xgboost", "lightgbm"}
+    for model in models.values():
+        assert model.predict_proba(X_test).shape == (len(X_test), 2)
+
+
+def test_cross_validate_models_summarizes_each_model(modeling_dataset):
+    X_train, _, y_train, _ = split_data(modeling_dataset)
+
+    results = cross_validate_models(X_train, y_train, cv=3)
+
+    assert set(results) == {"gradient_boosting", "xgboost", "lightgbm"}
+    for summary in results.values():
+        assert set(summary) == {"roc_auc", "f1", "precision", "recall"}
+        assert {"mean", "std"} <= set(summary["roc_auc"])
+        assert 0.5 < summary["roc_auc"]["mean"] <= 1.0
 
 
 def test_compare_validation_has_baseline_holdout_and_cv_rows(modeling_dataset):

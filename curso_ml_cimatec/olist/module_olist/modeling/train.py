@@ -14,6 +14,11 @@ from sklearn.preprocessing import OneHotEncoder
 import typer
 
 from module_olist.config import MODELS_DIR, PROCESSED_DATA_DIR, REPORTS_DIR
+from module_olist.modeling.pipeline import (
+    create_gradient_boosting_pipeline,
+    create_lightgbm_pipeline,
+    create_xgboost_pipeline,
+)
 from module_olist.modeling.split import FEATURES, split_data
 
 app = typer.Typer()
@@ -26,6 +31,8 @@ SCORING = {
     "average_precision": "average_precision",
     "f1": "f1",
 }
+
+CV_METRICS = ["roc_auc", "f1", "precision", "recall"]
 
 
 def build_model(random_state: int = 42) -> Pipeline:
@@ -47,6 +54,66 @@ def build_model(random_state: int = 42) -> Pipeline:
         random_state=random_state,
     )
     return Pipeline([("preprocessor", preprocessor), ("model", model)])
+
+
+def _build_models() -> dict[str, Pipeline]:
+    return {
+        "gradient_boosting": create_gradient_boosting_pipeline(),
+        "xgboost": create_xgboost_pipeline(),
+        "lightgbm": create_lightgbm_pipeline(),
+    }
+
+
+def train_models(x_train, y_train) -> dict[str, Pipeline]:
+    """Treina os modelos configurados e retorna os pipelines ajustados."""
+    models = {}
+
+    for name, model in _build_models().items():
+        logger.info(f"Treinando modelo {name}...")
+        model.fit(x_train, y_train)
+        models[name] = model
+
+    return models
+
+
+def cross_validate_models(
+    x: pd.DataFrame,
+    y: pd.Series,
+    cv: int = 5,
+    random_state: int = 42,
+) -> dict[str, dict[str, dict[str, float]]]:
+    """Avalia os modelos com folds estratificados e retorna médias e desvios."""
+    splitter = StratifiedKFold(n_splits=cv, shuffle=True, random_state=random_state)
+    results = {}
+
+    for name, model in _build_models().items():
+        scores = cross_validate(model, x, y, cv=splitter, scoring=CV_METRICS)
+        # cross_validate devolve um array de `cv` valores por métrica (um por fold).
+        # Logamos fold a fold para ver a variação entre eles: um fold muito pior
+        # que os outros pode indicar um subconjunto de dados atípico.
+        for fold_idx in range(cv):
+            fold_metrics = ", ".join(
+                f"{metric}={scores[f'test_{metric}'][fold_idx]:.3f}" for metric in CV_METRICS
+            )
+            logger.debug(f"[CV] {name} | fold {fold_idx + 1}/{cv}: {fold_metrics}")
+
+        summary = {
+            metric: {
+                "mean": scores[f"test_{metric}"].mean(),
+                "std": scores[f"test_{metric}"].std(),
+            }
+            for metric in CV_METRICS
+        }
+        results[name] = summary
+        logger.info(
+            f"[CV] {name}: "
+            + ", ".join(
+                f"{metric}={values['mean']:.3f}+/-{values['std']:.3f}"
+                for metric, values in summary.items()
+            )
+        )
+
+    return results
 
 
 def cross_validate_model(
