@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+# Fotos de pessoas reais não são versionadas; só as pastas.
+fotos_autorizadas/*
+fotos_teste/*
+resultados/*
+!fotos_autorizadas/.gitkeep
+!fotos_teste/.gitkeep
+!resultados/.gitkeep
