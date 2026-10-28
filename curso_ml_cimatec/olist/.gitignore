@@ -189,5 +189,3 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-# Modelo treinado (artefato binário grande)
-models/*.pkl
