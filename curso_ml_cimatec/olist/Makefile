@@ -67,6 +67,11 @@ create_environment:
 data: requirements
 	$(PYTHON_INTERPRETER) module_olist/dataset.py
 
+## Validate raw datasets with pandera and report the most common errors
+.PHONY: validate
+validate: requirements
+	$(PYTHON_INTERPRETER) module_olist/validation.py
+
 
 #################################################################################
 # Self Documenting Commands                                                     #
