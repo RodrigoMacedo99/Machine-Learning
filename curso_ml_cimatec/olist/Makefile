@@ -72,6 +72,11 @@ data: requirements
 validate: requirements
 	$(PYTHON_INTERPRETER) module_olist/validation.py
 
+## Run the full pipeline: features, training, SHAP and active learning
+.PHONY: pipeline
+pipeline: requirements
+	$(PYTHON_INTERPRETER) main.py
+
 
 #################################################################################
 # Self Documenting Commands                                                     #
