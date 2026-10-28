@@ -19,7 +19,6 @@ dependencies = [
     "ipykernel>=7.3.0",
     "ipython",
     "jupyterlab",
-    "kagglehub[pandas-datasets]",
     "lightgbm>=4.7.0",
     "loguru",
     "matplotlib",

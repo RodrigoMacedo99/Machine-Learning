@@ -1,63 +1,30 @@
+from pathlib import Path
+
 from loguru import logger
-import pandas as pd
-from sklearn.model_selection import StratifiedKFold, cross_validate
-from sklearn.pipeline import Pipeline
+from tqdm import tqdm
+import typer
 
-from module_olist.modeling.pipeline import (
-    create_gradient_boosting_pipeline,
-    create_lightgbm_pipeline,
-    create_xgboost_pipeline,
-)
+from module_olist.config import MODELS_DIR, PROCESSED_DATA_DIR
 
-SCORING = ["roc_auc", "f1", "precision", "recall"]
+app = typer.Typer()
 
 
-def _build_models() -> dict[str, Pipeline]:
-    return {
-        "gradient_boosting": create_gradient_boosting_pipeline(),
-        "xgboost": create_xgboost_pipeline(),
-        "lightgbm": create_lightgbm_pipeline(),
-    }
+@app.command()
+def main(
+    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
+    features_path: Path = PROCESSED_DATA_DIR / "features.csv",
+    labels_path: Path = PROCESSED_DATA_DIR / "labels.csv",
+    model_path: Path = MODELS_DIR / "model.pkl",
+    # -----------------------------------------
+):
+    # ---- REPLACE THIS WITH YOUR OWN CODE ----
+    logger.info("Training some model...")
+    for i in tqdm(range(10), total=10):
+        if i == 5:
+            logger.info("Something happened for iteration 5.")
+    logger.success("Modeling training complete.")
+    # -----------------------------------------
 
 
-def train_models(x_train, y_train) -> dict[str, Pipeline]:
-    """Treina os modelos configurados e retorna os pipelines ajustados."""
-    models = {}
-
-    for name, model in _build_models().items():
-        logger.info(f"Treinando modelo {name}...")
-        model.fit(x_train, y_train)
-        models[name] = model
-
-    return models
-
-
-def cross_validate_models(
-    x: pd.DataFrame,
-    y: pd.Series,
-    cv: int = 5,
-    random_state: int = 42,
-) -> dict[str, dict[str, dict[str, float]]]:
-    """Avalia os modelos com folds estratificados e retorna médias e desvios."""
-    splitter = StratifiedKFold(n_splits=cv, shuffle=True, random_state=random_state)
-    results = {}
-
-    for name, model in _build_models().items():
-        scores = cross_validate(model, x, y, cv=splitter, scoring=SCORING)
-        summary = {
-            metric: {
-                "mean": scores[f"test_{metric}"].mean(),
-                "std": scores[f"test_{metric}"].std(),
-            }
-            for metric in SCORING
-        }
-        results[name] = summary
-        logger.info(
-            f"[CV] {name}: "
-            + ", ".join(
-                f"{metric}={values['mean']:.3f}+/-{values['std']:.3f}"
-                for metric, values in summary.items()
-            )
-        )
-
-    return results
+if __name__ == "__main__":
+    app()
