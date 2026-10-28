@@ -1,10 +1,9 @@
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
+from lightgbm import LGBMClassifier
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
 from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-
 
 NUMERICAL_FEATURES = [
     "promised_days",
@@ -48,7 +47,8 @@ def create_gradient_boosting_pipeline() -> Pipeline:
             n_estimators=100, # Número de árvores na floresta
             learning_rate=0.1, # Taxa de aprendizado
             max_depth=3, # Profundidade máxima das árvores
-            random_state=42 # Semente para reprodutibilidade
+            random_state=42, # Semente para reprodutibilidade
+            verbose=0,
         )
     return Pipeline(steps=[("preprocessor", preprocessor), ("model", model)])
 
@@ -64,7 +64,8 @@ def create_xgboost_pipeline() -> Pipeline:
             n_estimators=100, # Número de árvores na floresta
             learning_rate=0.1, # Taxa de aprendizado
             max_depth=3, # Profundidade máxima das árvores
-            random_state=42 # Semente para reprodutibilidade
+            random_state=42, # Semente para reprodutibilidade
+            verbosity=0,
         )
     return Pipeline(steps=[("preprocessor", preprocessor), ("model", model)])
 
@@ -80,6 +81,7 @@ def create_lightgbm_pipeline() -> Pipeline:
             n_estimators=100, # Número de árvores na floresta
             learning_rate=0.1, # Taxa de aprendizado
             max_depth=3, # Profundidade máxima das árvores
-            random_state=42 # Semente para reprodutibilidade
+            random_state=42, # Semente para reprodutibilidade
+            verbosity=-1,
         )
     return Pipeline(steps=[("preprocessor", preprocessor), ("model", model)])

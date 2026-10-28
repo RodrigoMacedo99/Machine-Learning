@@ -1,7 +1,7 @@
 from pathlib import Path
 
-import typer
 from loguru import logger
+import typer
 
 from module_olist.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
 from module_olist.dataset import load_dataset, save_dataset
@@ -36,12 +36,17 @@ def run_pipeline(
         dataset, features=FEATURE_COLUMNS, target="is_late"
     )
 
-    logger.info("Executando cross-validation nos dados de treino...")
-    cross_validate_models(x_train, y_train)
+	if features_path is not None:
+		features_path.parent.mkdir(parents=True, exist_ok=True)
+		save_dataset(dataset, features_path)
 
-    models = train_models(x_train, y_train)
-    if not models:
-        raise RuntimeError("Nenhum modelo foi treinado.")
+	x_train, x_test, y_train, y_test = split_data(
+		dataset, features=FEATURE_COLUMNS, target="is_late"
+	)
+	cross_validate_models(x_train, y_train)
+	models = train_models(x_train, y_train)
+	if not models:
+		raise RuntimeError("Nenhum modelo foi treinado.")
 
     evaluate_model(models, x_test, y_test)
     return models

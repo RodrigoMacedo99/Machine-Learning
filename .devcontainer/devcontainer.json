@@ -1,0 +1,13 @@
+{
+  "name": "Meu Codespace",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // Define o Zsh como o terminal padrão no VS Code do Codespace
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    }
+  },
+  // Altera o shell padrão do usuário do sistema para o Zsh assim que o container é criado [1]
+  "postCreateCommand": "sudo chsh \"$(id -un)\" --shell \"/usr/bin/zsh\""
+}
