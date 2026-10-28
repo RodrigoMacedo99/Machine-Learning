@@ -6,7 +6,7 @@ from sklearn.preprocessing import OneHotEncoder
 from xgboost import XGBClassifier
 
 NUMERICAL_FEATURES = [
-    "promised_days",
+    "purchase_day",
     "item_count",
     "seller_count",
     "total_price",
@@ -18,7 +18,7 @@ CATEGORICAL_FEATURES = [
     "purchase_weekday",
     "purchase_hour",
     "customer_state"
-]   
+]
 
 
 def create_preprocessor() -> ColumnTransformer:
