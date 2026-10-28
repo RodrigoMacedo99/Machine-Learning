@@ -7,3 +7,4 @@ nav:
   - Home: index.md
   - Getting started: getting-started.md
   - Data Pipeline: data-pipeline.md
+  - Features: features.md
