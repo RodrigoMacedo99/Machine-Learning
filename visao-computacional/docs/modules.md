@@ -1,1 +1,0 @@
-::: visao_computacional.foo
