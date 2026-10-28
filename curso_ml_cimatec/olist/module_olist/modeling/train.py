@@ -30,11 +30,14 @@ SCORING = {
 
 def build_model(random_state: int = 42) -> Pipeline:
     """Pré-processa as features (one-hot para UF, mediana para numéricas) e treina uma Random Forest."""
+    # sparse_threshold=0 força saída densa: com as 27 UFs o one-hot vira matriz esparsa,
+    # e a explicação SHAP (explain.py) monta um DataFrame a partir dela.
     preprocessor = ColumnTransformer(
         [
             ("categorical", OneHotEncoder(handle_unknown="ignore"), CATEGORICAL_FEATURES),
             ("numeric", SimpleImputer(strategy="median"), NUMERIC_FEATURES),
-        ]
+        ],
+        sparse_threshold=0,
     )
     model = RandomForestClassifier(
         n_estimators=200,

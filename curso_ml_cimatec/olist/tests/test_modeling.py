@@ -18,6 +18,20 @@ def fitted_model(modeling_dataset):
     return build_model().fit(X_train, y_train)
 
 
+def test_preprocessor_returns_dense_array_with_many_states(modeling_dataset):
+    # Com muitas UFs o one-hot ficaria esparso e quebraria a montagem do DataFrame em explain.py.
+    data = modeling_dataset.copy()
+    data["customer_state"] = [f"UF{i % 27:02d}" for i in range(len(data))]
+    X_train, _, y_train, _ = split_data(data)
+
+    model = build_model().fit(X_train, y_train)
+    preprocessor = model.named_steps["preprocessor"]
+    transformed = preprocessor.transform(X_train)
+
+    assert isinstance(transformed, np.ndarray)
+    assert transformed.shape[1] == len(preprocessor.get_feature_names_out())
+
+
 def test_build_model_returns_pipeline_that_predicts_probabilities(modeling_dataset):
     X_train, X_test, y_train, _ = split_data(modeling_dataset)
 
